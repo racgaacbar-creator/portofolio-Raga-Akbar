@@ -15,13 +15,16 @@ export async function POST(request: Request) {
     const token = process.env.BLOB_READ_WRITE_TOKEN;
 
     if (token) {
-      // Upload directly to Vercel Blob Store (Production)
+      // Upload directly to Vercel Blob Store (Production & Local if token configured)
       const blob = await put(`uploads/${Date.now()}-${file.name}`, file, {
         access: 'public',
         token: token,
       });
       return NextResponse.json({ url: blob.url });
-    } else {
+    } 
+    
+    // Only use local fallback in development environment
+    if (process.env.NODE_ENV === 'development') {
       // Fallback to local public/uploads directory (Local Development)
       console.warn("BLOB_READ_WRITE_TOKEN is missing. Saving file to local public/uploads directory.");
       
@@ -40,6 +43,9 @@ export async function POST(request: Request) {
 
       return NextResponse.json({ url: `/uploads/${fileName}` });
     }
+
+    // In production, throw error if token is missing (writing to local filesystem is read-only)
+    throw new Error("BLOB_READ_WRITE_TOKEN is missing in production. Please check Vercel Blob configuration.");
   } catch (error: any) {
     console.error("Upload Error:", error);
     return NextResponse.json({ error: error.message || 'Failed to upload file.' }, { status: 500 });
