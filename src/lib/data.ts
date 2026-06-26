@@ -1,4 +1,6 @@
 import { supabase } from './supabase';
+import localData from '../../data.json';
+
 
 export interface ProfileData {
   name: string;
@@ -59,6 +61,11 @@ export interface PortfolioData {
 
 // Supabase fetching
 export async function getPortfolioData(): Promise<PortfolioData> {
+  if (!supabase) {
+    console.warn("Supabase is not initialized. Falling back to local data.json");
+    return localData as PortfolioData;
+  }
+
   try {
     const { data, error } = await supabase
       .from('portfolio_settings')
@@ -68,21 +75,26 @@ export async function getPortfolioData(): Promise<PortfolioData> {
 
     if (error) {
       console.error("Supabase Error fetching data:", error.message);
-      throw new Error("Failed to read data from Supabase");
+      return localData as PortfolioData;
     }
 
     if (data && data.json_data) {
       return data.json_data as PortfolioData;
     }
 
-    throw new Error("No data found in Supabase");
+    return localData as PortfolioData;
   } catch (error) {
-    console.error("Error reading data, falling back to empty/default", error);
-    throw error;
+    console.error("Error reading data, falling back to local data.json", error);
+    return localData as PortfolioData;
   }
 }
 
 export async function savePortfolioData(newData: PortfolioData): Promise<void> {
+  if (!supabase) {
+    console.error("Cannot save data: Supabase is not initialized.");
+    throw new Error("Database connection is not configured.");
+  }
+
   try {
     // We update the only existing row. If there are multiple rows, we just update all (or assume there's only 1 row).
     // In our setup script, we only created one row.
