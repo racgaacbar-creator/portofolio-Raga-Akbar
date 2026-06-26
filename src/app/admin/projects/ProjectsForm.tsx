@@ -40,11 +40,12 @@ export default function ProjectsForm({ fullData }: { fullData: PortfolioData }) 
         body: JSON.stringify(updatedData)
       });
 
+      const data = await res.json();
       if (res.ok) {
         setMessage('Projects updated successfully!');
         router.refresh();
       } else {
-        setMessage('Failed to update projects.');
+        setMessage(data.error || 'Failed to update projects.');
       }
     } catch (err) {
       setMessage('An error occurred.');

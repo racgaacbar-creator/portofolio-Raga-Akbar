@@ -40,11 +40,12 @@ export default function EducationForm({ fullData }: { fullData: PortfolioData })
         body: JSON.stringify(updatedData)
       });
 
+      const data = await res.json();
       if (res.ok) {
         setMessage('Education updated successfully!');
         router.refresh();
       } else {
-        setMessage('Failed to update education.');
+        setMessage(data.error || 'Failed to update education.');
       }
     } catch (err) {
       setMessage('An error occurred.');

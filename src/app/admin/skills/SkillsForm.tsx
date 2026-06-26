@@ -40,11 +40,12 @@ export default function SkillsForm({ fullData }: { fullData: PortfolioData }) {
         body: JSON.stringify(updatedData)
       });
 
+      const data = await res.json();
       if (res.ok) {
         setMessage('Skills updated successfully!');
         router.refresh();
       } else {
-        setMessage('Failed to update skills.');
+        setMessage(data.error || 'Failed to update skills.');
       }
     } catch (err) {
       setMessage('An error occurred.');

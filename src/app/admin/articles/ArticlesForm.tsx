@@ -40,11 +40,12 @@ export default function ArticlesForm({ fullData }: { fullData: PortfolioData }) 
         body: JSON.stringify(updatedData)
       });
 
+      const data = await res.json();
       if (res.ok) {
         setMessage('Articles updated successfully!');
         router.refresh();
       } else {
-        setMessage('Failed to update articles.');
+        setMessage(data.error || 'Failed to update articles.');
       }
     } catch (err) {
       setMessage('An error occurred.');

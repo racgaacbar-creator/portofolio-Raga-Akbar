@@ -55,11 +55,12 @@ export default function ProfileForm({ fullData }: { fullData: PortfolioData }) {
         body: JSON.stringify(updatedData)
       });
 
+      const data = await res.json();
       if (res.ok) {
         setMessage('Profile updated successfully!');
         router.refresh();
       } else {
-        setMessage('Failed to update profile.');
+        setMessage(data.error || 'Failed to update profile.');
       }
     } catch (err) {
       setMessage('An error occurred.');

@@ -40,11 +40,12 @@ export default function ExperienceForm({ fullData }: { fullData: PortfolioData }
         body: JSON.stringify(updatedData)
       });
 
+      const data = await res.json();
       if (res.ok) {
         setMessage('Experience updated successfully!');
         router.refresh();
       } else {
-        setMessage('Failed to update experience.');
+        setMessage(data.error || 'Failed to update experience.');
       }
     } catch (err) {
       setMessage('An error occurred.');
