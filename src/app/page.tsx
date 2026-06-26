@@ -3,6 +3,8 @@ import FadeIn from '@/components/FadeIn';
 import { Briefcase, GraduationCap, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const data = await getPortfolioData();
 

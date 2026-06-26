@@ -3,6 +3,8 @@ import FadeIn from '@/components/FadeIn';
 import Link from 'next/link';
 import { Calendar, ChevronRight } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Articles | Raga Akbar',
   description: 'Articles and writings by Raga Akbar',

@@ -2,6 +2,8 @@ import { getPortfolioData } from '@/lib/data';
 import FadeIn from '@/components/FadeIn';
 import { Mail, Phone } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Contact | Raga Akbar',
   description: 'Get in touch with Raga Akbar',
