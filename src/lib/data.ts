@@ -67,11 +67,18 @@ export interface PortfolioData {
 // Vercel Blob fetching
 export async function getPortfolioData(): Promise<PortfolioData> {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const isDev = process.env.NODE_ENV === 'development';
 
-  if (token) {
+  // In production, we always try Vercel Blob first (OIDC is automatically used if token is missing)
+  // In development, we only try Vercel Blob if the token is configured
+  if (!isDev || token) {
     try {
       console.log("Fetching portfolio data from Vercel Blob...");
-      const response = await list({ token });
+      const listOptions: any = {};
+      if (token) {
+        listOptions.token = token;
+      }
+      const response = await list(listOptions);
       const dataBlob = response.blobs.find(b => b.pathname === 'data.json');
       
       if (dataBlob) {
@@ -87,7 +94,7 @@ export async function getPortfolioData(): Promise<PortfolioData> {
     }
   }
 
-  // Fallback: Read local data.json file from disk (development or if token is missing)
+  // Fallback: Read local data.json file from disk (development or if token/cloud fetch is missing)
   try {
     if (fs.existsSync(localDataPath)) {
       const fileContent = fs.readFileSync(localDataPath, 'utf8');
@@ -102,9 +109,10 @@ export async function getPortfolioData(): Promise<PortfolioData> {
 
 export async function savePortfolioData(newData: PortfolioData): Promise<void> {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const isDev = process.env.NODE_ENV === 'development';
 
   // In development, save to local filesystem to ensure local state is persistent
-  if (process.env.NODE_ENV === 'development') {
+  if (isDev) {
     try {
       console.log("Saving portfolio data to local data.json...");
       fs.writeFileSync(localDataPath, JSON.stringify(newData, null, 2), 'utf8');
@@ -114,20 +122,21 @@ export async function savePortfolioData(newData: PortfolioData): Promise<void> {
     }
   }
 
-  // If Vercel Blob token is configured, upload to Vercel Blob
-  if (token) {
+  // In production (or in development if token is present), upload to Vercel Blob
+  if (!isDev || token) {
     try {
       console.log("Saving portfolio data to Vercel Blob...");
-      await put('data.json', JSON.stringify(newData, null, 2), {
+      const putOptions: any = {
         access: 'public',
         addRandomSuffix: false,
-        token: token,
-      });
-    } catch (error) {
+      };
+      if (token) {
+        putOptions.token = token;
+      }
+      await put('data.json', JSON.stringify(newData, null, 2), putOptions);
+    } catch (error: any) {
       console.error("Failed to save data to Vercel Blob:", error);
-      throw new Error("Failed to save data to cloud storage");
+      throw new Error(error.message || "Failed to save data to cloud storage");
     }
-  } else if (process.env.NODE_ENV !== 'development') {
-    throw new Error("BLOB_READ_WRITE_TOKEN is missing. Cannot save data to cloud storage.");
   }
 }

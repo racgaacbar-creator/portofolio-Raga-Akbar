@@ -14,19 +14,9 @@ export async function POST(request: Request) {
 
     const token = process.env.BLOB_READ_WRITE_TOKEN;
 
-    if (token) {
-      // Upload directly to Vercel Blob Store (Production & Local if token configured)
-      const blob = await put(`uploads/${Date.now()}-${file.name}`, file, {
-        access: 'public',
-        token: token,
-      });
-      return NextResponse.json({ url: blob.url });
-    } 
-    
-    // Only use local fallback in development environment
-    if (process.env.NODE_ENV === 'development') {
-      // Fallback to local public/uploads directory (Local Development)
-      console.warn("BLOB_READ_WRITE_TOKEN is missing. Saving file to local public/uploads directory.");
+    // Use local fallback in development environment only if token is missing
+    if (process.env.NODE_ENV === 'development' && !token) {
+      console.warn("BLOB_READ_WRITE_TOKEN is missing in development. Saving file to local public/uploads directory.");
       
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
@@ -44,8 +34,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ url: `/uploads/${fileName}` });
     }
 
-    // In production, throw error if token is missing (writing to local filesystem is read-only)
-    throw new Error("BLOB_READ_WRITE_TOKEN is missing in production. Please check Vercel Blob configuration.");
+    // In production (or in development if token is present), upload directly to Vercel Blob Store
+    // (OIDC is automatically used on Vercel if token is missing)
+    const options: any = { access: 'public' };
+    if (token) {
+      options.token = token;
+    }
+
+    const blob = await put(`uploads/${Date.now()}-${file.name}`, file, options);
+    return NextResponse.json({ url: blob.url });
   } catch (error: any) {
     console.error("Upload Error:", error);
     return NextResponse.json({ error: error.message || 'Failed to upload file.' }, { status: 500 });
