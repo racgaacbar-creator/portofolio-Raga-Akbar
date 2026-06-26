@@ -1,6 +1,5 @@
+import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 export async function POST(request: Request) {
   try {
@@ -11,25 +10,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file received.' }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Upload directly to Vercel Blob Store
+    const blob = await put(`uploads/${Date.now()}-${file.name}`, file, {
+      access: 'public',
+    });
 
-    // Pastikan folder public/uploads ada
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    // Buat nama file unik (atau cukup timpa dengan nama profile.jpg jika khusus profile)
-    const fileName = `profile-${Date.now()}${path.extname(file.name)}`;
-    const filePath = path.join(uploadDir, fileName);
-
-    fs.writeFileSync(filePath, buffer);
-
-    // Kembalikan URL publik untuk diakses di frontend
-    return NextResponse.json({ url: `/uploads/${fileName}` });
+    // Return the public URL for storage and front-end preview
+    return NextResponse.json({ url: blob.url });
   } catch (error) {
     console.error("Upload Error:", error);
     return NextResponse.json({ error: 'Failed to upload file.' }, { status: 500 });
   }
 }
+
