@@ -1,21 +1,40 @@
 {
   "profile": {
-    "name": "RAGA AKBAR",
-    "title": "Designer & AR Development",
-    "about": "My name is Raga Akbar. I'm a third-year Informatics Engineering student from Tanjung Pinang, and I came across Nodeflux while browsing through Indonesian tech companies working in computer vision.",
+    "name": "Raga Akbar Test",
+    "about": "My name is Raga Akbar. I'm a third-year Informatics Engineering student...",
     "email": "rakbar@student.umrah.ac.id",
+    "image": "/uploads/profile-1782487206871.jpghttp://example.com/test.jpg",
     "phone": "082372433085",
-    "linkedin": "https://www.linkedin.com/in/raga-akbar-439556411/",
+    "title": "Designer & AR Development",
     "github": "racgaacbar",
+    "linkedin": "https://www.linkedin.com/in/raga-akbar-439556411/",
     "instagram": "ragakbr"
   },
   "skills": [
-    { "name": "Flutter", "level": 80 },
-    { "name": "UI/UX & Design", "level": 90 },
-    { "name": "AR Development", "level": 75 },
-    { "name": "Microsoft Office", "level": 95 },
-    { "name": "Critical Thinking", "level": 85 },
-    { "name": "Leadership", "level": 85 }
+    {
+      "name": "Flutter",
+      "level": 80
+    },
+    {
+      "name": "UI/UX & Design",
+      "level": 90
+    },
+    {
+      "name": "AR Development",
+      "level": 75
+    },
+    {
+      "name": "Microsoft Office",
+      "level": 95
+    },
+    {
+      "name": "Critical Thinking",
+      "level": 85
+    },
+    {
+      "name": "Leadership",
+      "level": 85
+    }
   ],
   "education": [
     {
