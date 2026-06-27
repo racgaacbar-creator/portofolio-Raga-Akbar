@@ -143,6 +143,7 @@ export async function savePortfolioData(newData: PortfolioData): Promise<void> {
       const putOptions: any = {
         access: 'public',
         addRandomSuffix: false,
+        allowOverwrite: true,
       };
       if (token) {
         putOptions.token = token;
