@@ -27,6 +27,36 @@ export default function ProjectsForm({ fullData }: { fullData: PortfolioData }) 
     setProjectsList(newList);
   };
 
+  const handleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    setLoading(true);
+    setMessage('Uploading image...');
+    
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        const newList = [...projectsList];
+        newList[index] = { ...newList[index], image: data.url };
+        setProjectsList(newList);
+        setMessage("Image uploaded successfully! (Don't forget to save projects)");
+      } else {
+        setMessage(data.error || 'Failed to upload image.');
+      }
+    } catch (err) {
+      setMessage('Error uploading image.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -85,8 +115,16 @@ export default function ProjectsForm({ fullData }: { fullData: PortfolioData }) 
                 <input value={project.link || ''} onChange={(e) => handleChange(index, 'link', e.target.value)} style={inputStyle} />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={labelStyle}>Image URL (optional)</label>
-                <input value={project.image || ''} onChange={(e) => handleChange(index, 'image', e.target.value)} style={inputStyle} />
+                <label style={labelStyle}>Project Image</label>
+                <div className="flex gap-4 items-center">
+                  {project.image && (
+                    <img src={project.image} alt="Project Preview" style={{ width: '80px', height: '60px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--border-glass)' }} />
+                  )}
+                  <div style={{ flex: 1 }}>
+                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(index, e)} style={{ display: 'block', marginBottom: '8px', color: 'var(--text-secondary)' }} />
+                    <input value={project.image || ''} onChange={(e) => handleChange(index, 'image', e.target.value)} style={inputStyle} placeholder="Or paste image URL here (e.g. https://example.com/photo.jpg)" />
+                  </div>
+                </div>
               </div>
             </div>
             <div>
