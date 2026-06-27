@@ -12,32 +12,42 @@ export default async function Home() {
     <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '80px', paddingTop: '40px' }}>
       
       {/* Hero Section */}
-      <section style={{ minHeight: '60vh', display: 'flex', alignItems: 'center' }}>
-        <div style={{ flex: 1 }}>
+      <section style={{ 
+        minHeight: '70vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        gap: '60px',
+        flexWrap: 'wrap-reverse'
+      }}>
+        <div style={{ flex: '1 1 500px' }}>
           <FadeIn>
-            <h1 style={{ fontSize: '4rem', marginBottom: '0.5rem' }}>
+            <h1 style={{ fontSize: '4rem', marginBottom: '0.5rem', lineHeight: '1.2' }}>
               Hi, I'm <br/><span className="gradient-text">{data.profile.name}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <h2 style={{ color: 'var(--text-secondary)', fontWeight: 400, fontSize: '2rem' }}>
+            <h2 style={{ color: 'var(--text-secondary)', fontWeight: 400, fontSize: '2rem', marginBottom: '2rem' }}>
               {data.profile.title}
             </h2>
           </FadeIn>
           <FadeIn delay={0.4}>
-            <p style={{ maxWidth: '600px', fontSize: '1.2rem', marginTop: '1.5rem' }}>
-              {data.profile.about}
-            </p>
+            <div style={{ fontSize: '1.1rem', lineHeight: '1.8', color: 'rgba(255, 255, 255, 0.8)', display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '650px' }}>
+              {(data.profile.about || '').split('\n').map((paragraph, idx) => (
+                paragraph.trim() ? <p key={idx} style={{ margin: 0, textAlign: 'justify' }}>{paragraph}</p> : null
+              ))}
+            </div>
           </FadeIn>
         </div>
-        {/* Placeholder for Profile Image */}
-        <FadeIn delay={0.4} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        
+        {/* Profile Image */}
+        <FadeIn delay={0.4} style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center' }}>
           <div style={{ 
-            width: '350px', height: '350px', 
+            width: '400px', height: '400px', 
             borderRadius: '50%', 
             background: 'linear-gradient(45deg, var(--accent-cyan), var(--accent-purple))',
-            padding: '4px',
-            boxShadow: '0 0 40px var(--accent-glow)'
+            padding: '6px',
+            boxShadow: '0 0 60px rgba(162, 0, 255, 0.2)'
           }}>
             <div style={{
               width: '100%', height: '100%',
