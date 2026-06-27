@@ -109,34 +109,34 @@ export async function getPortfolioData(): Promise<PortfolioData> {
 
 export async function savePortfolioData(newData: PortfolioData): Promise<void> {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
-  const isDev = process.env.NODE_ENV === 'development';
 
-  // In development, save to local filesystem to ensure local state is persistent
-  if (isDev) {
-    try {
-      console.log("Saving portfolio data to local data.json...");
-      fs.writeFileSync(localDataPath, JSON.stringify(newData, null, 2), 'utf8');
-    } catch (error) {
-      console.error("Failed to write local data.json:", error);
-      throw new Error("Failed to save data locally");
-    }
+  let localSaveSuccess = false;
+  // Always try to save locally (works for dev and local prod builds)
+  try {
+    console.log("Saving portfolio data to local data.json...");
+    fs.writeFileSync(localDataPath, JSON.stringify(newData, null, 2), 'utf8');
+    localSaveSuccess = true;
+  } catch (error) {
+    console.error("Failed to write local data.json:", error);
+    // Don't throw yet, maybe Vercel Blob will succeed (e.g. deployed on Vercel where local write fails)
   }
 
-  // In production (or in development if token is present), upload to Vercel Blob
-  if (!isDev || token) {
+  // Upload to Vercel Blob if token is present
+  if (token) {
     try {
       console.log("Saving portfolio data to Vercel Blob...");
       const putOptions: any = {
         access: 'public',
         addRandomSuffix: false,
+        token: token,
       };
-      if (token) {
-        putOptions.token = token;
-      }
       await put('data.json', JSON.stringify(newData, null, 2), putOptions);
     } catch (error: any) {
       console.error("Failed to save data to Vercel Blob:", error);
       throw new Error(error.message || "Failed to save data to cloud storage");
     }
+  } else if (!localSaveSuccess) {
+    // If both local save failed and no token is present to save to cloud, throw error
+    throw new Error("Failed to save data locally and no cloud storage token provided");
   }
 }

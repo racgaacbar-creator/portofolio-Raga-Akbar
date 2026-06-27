@@ -28,7 +28,7 @@ export default async function Home() {
             <p style={{ maxWidth: '600px', fontSize: '1.2rem', marginTop: '1.5rem' }}>
               {data.profile.about}
             </p>
-          
+          </FadeIn>
         </div>
         {/* Placeholder for Profile Image */}
         <FadeIn delay={0.4} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
