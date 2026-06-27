@@ -94,34 +94,28 @@ export async function getPortfolioData(): Promise<PortfolioData> {
     }
   }
 
-  // Fallback: Read local data.json file from disk (development or if token/cloud fetch is missing)
+  const defaultData: PortfolioData = {
+    profile: { name: '', title: '', about: '', email: '', phone: '', linkedin: '', github: '', instagram: '' },
+    skills: [],
+    education: [],
+    experience: [],
+    projects: [],
+    articles: []
+  };
+
+  // Fallback: Read local data.json file from disk
   try {
     if (fs.existsSync(localDataPath)) {
       const fileContent = fs.readFileSync(localDataPath, 'utf8');
-      return JSON.parse(fileContent) as PortfolioData;
+      const parsedData = JSON.parse(fileContent);
+      return { ...defaultData, ...parsedData } as PortfolioData;
     }
   } catch (error) {
     console.error("Failed to read local data.json file:", error);
   }
 
   // Default empty data if no file exists
-  return {
-    profile: {
-      name: '',
-      title: '',
-      about: '',
-      email: '',
-      phone: '',
-      linkedin: '',
-      github: '',
-      instagram: ''
-    },
-    skills: [],
-    education: [],
-    experience: [],
-    projects: [],
-    articles: []
-  } as PortfolioData;
+  return defaultData;
 }
 
 export async function savePortfolioData(newData: PortfolioData): Promise<void> {
