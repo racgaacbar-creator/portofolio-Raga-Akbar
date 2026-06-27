@@ -1,7 +1,5 @@
 import { getPortfolioData } from '@/lib/data';
 import FadeIn from '@/components/FadeIn';
-import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,11 +33,6 @@ export default async function ProjectsPage() {
               </div>
               <h2 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{project.title}</h2>
               <p style={{ flex: 1 }}>{project.description}</p>
-              {project.link && (
-                <Link href={project.link} className="flex items-center gap-2" style={{ color: 'var(--accent-cyan)', marginTop: '16px', fontWeight: 500 }} target="_blank" rel="noopener noreferrer">
-                  View Project <ChevronRight size={16} />
-                </Link>
-              )}
             </div>
           </FadeIn>
         ))}
