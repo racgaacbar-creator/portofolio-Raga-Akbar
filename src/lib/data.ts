@@ -1,7 +1,7 @@
 import { list, put } from '@vercel/blob';
 import fs from 'fs';
 import path from 'path';
-import localData from '../../data.json';
+
 
 const localDataPath = path.join(process.cwd(), 'data.json');
 
@@ -104,12 +104,30 @@ export async function getPortfolioData(): Promise<PortfolioData> {
     console.error("Failed to read local data.json file:", error);
   }
 
-  return localData as PortfolioData;
+  // Default empty data if no file exists
+  return {
+    profile: {
+      name: '',
+      title: '',
+      about: '',
+      email: '',
+      phone: '',
+      linkedin: '',
+      github: '',
+      instagram: ''
+    },
+    skills: [],
+    education: [],
+    experience: [],
+    projects: [],
+    articles: []
+  } as PortfolioData;
 }
 
 export async function savePortfolioData(newData: PortfolioData): Promise<void> {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
 
+  let localSaveError: any = null;
   let localSaveSuccess = false;
   // Always try to save locally (works for dev and local prod builds)
   try {
@@ -118,25 +136,30 @@ export async function savePortfolioData(newData: PortfolioData): Promise<void> {
     localSaveSuccess = true;
   } catch (error) {
     console.error("Failed to write local data.json:", error);
+    localSaveError = error;
     // Don't throw yet, maybe Vercel Blob will succeed (e.g. deployed on Vercel where local write fails)
   }
 
-  // Upload to Vercel Blob if token is present
-  if (token) {
+  const isDev = process.env.NODE_ENV === 'development';
+
+  // Upload to Vercel Blob in production, or in dev if token is present
+  if (!isDev || token) {
     try {
       console.log("Saving portfolio data to Vercel Blob...");
       const putOptions: any = {
         access: 'public',
         addRandomSuffix: false,
-        token: token,
       };
+      if (token) {
+        putOptions.token = token;
+      }
       await put('data.json', JSON.stringify(newData, null, 2), putOptions);
     } catch (error: any) {
       console.error("Failed to save data to Vercel Blob:", error);
       throw new Error(error.message || "Failed to save data to cloud storage");
     }
   } else if (!localSaveSuccess) {
-    // If both local save failed and no token is present to save to cloud, throw error
-    throw new Error("Failed to save data locally and no cloud storage token provided");
+    // If both local save failed and no cloud save was attempted, throw error
+    throw new Error(`Failed to save data locally (${localSaveError?.message}) and no cloud storage token provided`);
   }
 }
