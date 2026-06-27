@@ -1,7 +1,6 @@
 import { getPortfolioData } from '@/lib/data';
 import FadeIn from '@/components/FadeIn';
-import Link from 'next/link';
-import { Calendar, ChevronRight } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,10 +31,6 @@ export default async function ArticlesPage() {
               </div>
               <h2 style={{ fontSize: '1.5rem', marginBottom: '12px' }}>{article.title}</h2>
               <p style={{ flex: 1 }}>{article.excerpt}</p>
-              
-              <Link href={`/articles/${article.id}`} className="flex items-center gap-2" style={{ color: 'var(--accent-purple)', marginTop: '24px', fontWeight: 500 }}>
-                Read Article <ChevronRight size={16} />
-              </Link>
             </article>
           </FadeIn>
         ))}
